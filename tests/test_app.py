@@ -1,5 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))  # Adds the parent directory
+
 from app.app import app  # Adjusted import for app in the 'app' folder
 
 # Create a TestClient to simulate requests to the FastAPI app
