@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - '*'  # Trigger on any push to any branch
+      - 'main'  # Trigger on any push to any branch
 
 pr:
   branches:
