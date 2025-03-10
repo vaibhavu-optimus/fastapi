@@ -1,0 +1,56 @@
+trigger:
+  branches:
+    include:
+      - '*'  # Trigger on any push to any branch
+
+pr:
+  branches:
+    include:
+      - main  # Trigger on PR merge to the main branch
+
+jobs:
+- job: BuildTestZipDeploy
+  displayName: 'Build, Test, Zip, and Drop FastAPI Application'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  # Step 1: Checkout the code from the repository
+  - checkout: self
+
+  # Step 2: Set up Python
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'  # Specify the Python version you need
+      addToPath: true
+
+  # Step 3: Install dependencies
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  # Step 4: Run tests (optional)
+  - script: |
+      pytest --maxfail=1 --disable-warnings -q  # Modify for your test command
+    displayName: 'Run tests'
+
+  # Step 5: Prepare the directory for zipping
+  - script: |
+      mkdir -p $(Build.ArtifactStagingDirectory)/my-fastapi-app
+      cp -r * $(Build.ArtifactStagingDirectory)/my-fastapi-app/
+    displayName: 'Prepare FastAPI app for zipping'
+
+  # Step 6: Zip the FastAPI app
+  - script: |
+      cd $(Build.ArtifactStagingDirectory)
+      zip -r my-fastapi-app.zip my-fastapi-app/
+    displayName: 'Zip FastAPI app for deployment'
+
+  # Step 7: Publish the zip artifact for use in the CD pipeline
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/my-fastapi-app.zip'  # Path to the zip file
+      ArtifactName: 'drop'  # Name of the artifact
+      publishLocation: 'Container'  # Store the artifact in Azure DevOps container
+    displayName: 'Publish the zipped artifact'
