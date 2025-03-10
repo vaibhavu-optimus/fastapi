@@ -1,7 +1,10 @@
+import sys  # Import sys
+import os  # Import os
 import pytest
 from fastapi.testclient import TestClient
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))  # Adds the parent directory
+# Adds the parent directory to sys.path so the app module can be found
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 from app.app import app  # Adjusted import for app in the 'app' folder
 
